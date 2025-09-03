@@ -1,10 +1,12 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import { SocketContext } from "../providers/SocketProvider";
+import SocketProvider from "../providers/SocketProvider";
 import { useParticipantStore } from "../stores/participant";
 import Participants from "../components/Participants";
-import { MediaSoupContext } from "../providers/MediaSoupProvider";
+import MediaSoupProvider, {
+  MediaSoupContext,
+} from "../providers/MediaSoupProvider";
 
 export default function Stream() {
   const [isVideoOn, setIsVideoOn] = useState(true);
@@ -44,7 +46,7 @@ export default function Stream() {
     //const videoProducer = await sendTransport.current?.produce({ track: videoTrack });
     addProducer(audioProducer);
     // addProducer(videoProducer);
-    setLocalStream(stream)
+    setLocalStream(stream);
   }
 
   return (

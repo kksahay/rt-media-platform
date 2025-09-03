@@ -68,9 +68,9 @@ export class Participant {
     consumerParticipant:
       | Socket
       | RemoteSocket<
-          DecorateAcknowledgementsWithMultipleResponses<DefaultEventsMap>,
-          any
-        >,
+        DecorateAcknowledgementsWithMultipleResponses<DefaultEventsMap>,
+        any
+      >,
     producer: Producer
   ) {
     const router = this.router;
@@ -178,12 +178,15 @@ export class Participant {
       "connectWebRtcTransport",
       async ({ transportId, dtlsParameters }, callback) => {
         const transport = this.#webRtcTransports.get(transportId);
+
         if (!transport) {
           return callback({
             success: false,
             error: `transport ${transportId} not found`,
           });
         }
+
+
         try {
           await transport.connect({ dtlsParameters });
           callback({ success: true });

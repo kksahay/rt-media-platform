@@ -1,10 +1,9 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import SocketProvider from "../providers/SocketProvider";
 import { useParticipantStore } from "../stores/participant";
 import Participants from "../components/Participants";
-import MediaSoupProvider, {
+import {
   MediaSoupContext,
 } from "../providers/MediaSoupProvider";
 
@@ -35,17 +34,18 @@ export default function Stream() {
   async function loadTracks() {
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
-      // video: true,
+      video: true,
     });
 
     const audioTrack = stream.getAudioTracks()[0];
-    // const videoTrack = stream.getVideoTracks()[0].clone();
+    const videoTrack = stream.getVideoTracks()[0];
     const audioProducer = await sendTransport?.produce({
       track: audioTrack,
     });
-    //const videoProducer = await sendTransport.current?.produce({ track: videoTrack });
+    const videoProducer = await sendTransport?.produce({ track: videoTrack });
+
     addProducer(audioProducer);
-    // addProducer(videoProducer);
+    addProducer(videoProducer);
     setLocalStream(stream);
   }
 
@@ -61,22 +61,20 @@ export default function Stream() {
         <div className="flex items-center justify-center gap-4">
           <button
             onClick={toggleMic}
-            className={`w-10 h-10 rounded-full border-2 border-black flex items-center justify-center ${
-              isMicOn
-                ? "hover:bg-black hover:text-white text-black"
-                : "bg-black text-white"
-            }`}
+            className={`w-10 h-10 rounded-full border-2 border-black flex items-center justify-center ${isMicOn
+              ? "hover:bg-black hover:text-white text-black"
+              : "bg-black text-white"
+              }`}
           >
             <span className="text-xs font-bold">{isMicOn ? "MIC" : "MIC"}</span>
           </button>
 
           <button
             onClick={toggleVideo}
-            className={`w-10 h-10 rounded-full border-2 border-black flex items-center justify-center ${
-              isVideoOn
-                ? "hover:bg-black hover:text-white text-black"
-                : "bg-black text-white"
-            }`}
+            className={`w-10 h-10 rounded-full border-2 border-black flex items-center justify-center ${isVideoOn
+              ? "hover:bg-black hover:text-white text-black"
+              : "bg-black text-white"
+              }`}
           >
             <span className="text-xs font-bold">
               {isVideoOn ? "CAM" : "CAM"}

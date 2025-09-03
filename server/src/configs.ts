@@ -47,7 +47,7 @@ export const mediaCodecs: RouterRtpCodecCapability[] = [
 export const plainTransportOpts: PlainTransportOptions = {
   listenIp: "127.0.0.1",
   rtcpMux: false,
-  comedia: true,
+  comedia: false,
 };
 
 export const audioCodec: RtpCapabilities = {

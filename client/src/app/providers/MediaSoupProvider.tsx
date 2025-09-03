@@ -65,7 +65,7 @@ export default function MediaSoupProvider({
 
     roomId.current = id;
 
-    socket.emit("joinRoom", { roomId: roomId.current, viewMode: false });
+    socket.emit("joinRoom", { roomId: roomId.current });
 
     const handleRouterCaps = async ({
       routerRtpCapabilities,

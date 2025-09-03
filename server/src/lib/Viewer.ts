@@ -1,32 +1,37 @@
 import {
-	PlainTransport, Router,
-	RtpCapabilities
+  PlainTransport,
+  Router,
+  RtpCapabilities,
+  Consumer,
+  ConsumerType,
+  MediaKind,
+  RtpParameters,
 } from "mediasoup/types";
 import { plainTransportOpts } from "../configs";
 
-
+export interface SDPConsumer {
+  id: string;
+  producerId: string;
+  kind: MediaKind;
+  rtpParameters: RtpParameters;
+  type: ConsumerType;
+}
 
 export class Viewer {
-  #plainTransports: Map<string, PlainTransport>;
+  #plainTransports = new Map<string, PlainTransport>();
+  #consumers = new Map<string, Consumer>();
 
-  constructor(
-    private readonly router: Router,
-  ) {
-    this.#plainTransports = new Map();
-  }
+  constructor(private readonly router: Router) {}
 
   async createPlainTransport() {
     const transport = await this.router.createPlainTransport(
       plainTransportOpts
     );
+
     this.#plainTransports.set(transport.id, transport);
 
-    return {
-      id: transport.id,
-      ip: transport.tuple.localIp,
-      port: transport.tuple.localPort,
-      rtcpPort: transport.rtcpTuple?.localPort,
-    };
+    transport.on("@close", () => this.#plainTransports.delete(transport.id));
+    return transport;
   }
 
   async connectTransport(
@@ -46,15 +51,20 @@ export class Viewer {
     producerId: string,
     paused: boolean,
     rtpCapabilities: RtpCapabilities
-  ) {
+  ): Promise<SDPConsumer> {
     const transport = this.#plainTransports.get(transportId);
     if (!transport)
       throw new Error(`transport with id "${transportId}" does not exist`);
+
     const consumer = await transport.consume({
       producerId,
       paused,
       rtpCapabilities,
     });
+
+    this.#consumers.set(consumer.id, consumer);
+    consumer.on("transportclose", () => this.#consumers.delete(consumer.id));
+
     return {
       id: consumer.id,
       producerId,

@@ -148,8 +148,10 @@ export class Participant {
             if (consumerResult) {
               this.socket.emit("newConsumer", {
                 participantId: participant.id,
+                id: consumerResult.id,
                 producerId: producer.id,
-                ...consumerResult,
+                kind: consumerResult.kind,
+                rtpParameters: consumerResult.rtpParameters,
               });
             }
           }
@@ -167,6 +169,7 @@ export class Participant {
             producing,
             consuming,
           });
+
           callback({ success: true, transport });
         } catch (err) {
           callback({ success: false, error: (err as Error).message });
@@ -214,13 +217,16 @@ export class Participant {
           const otherParticipants = this.participants.filter(
             (p) => p.id !== this.socket.id
           );
+
           for (const other of otherParticipants) {
             const consumerResult = await this.#createConsumer(other, producer);
             if (consumerResult) {
               this.socket.to(other.id).emit("newConsumer", {
                 participantId: this.socket.id,
+                id: consumerResult.id,
                 producerId: producer.id,
-                ...consumerResult,
+                kind: consumerResult.kind,
+                rtpParameters: consumerResult.rtpParameters,
               });
             }
           }

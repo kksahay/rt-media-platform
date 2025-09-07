@@ -1,18 +1,17 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { Consumer } from "mediasoup-client/types";
 
 type Props = {
   id?: string;
   self?: boolean;
-  producers?: any[];
-  consumers?: any[];
+  consumers?: (Consumer | undefined)[];
 };
 
 export default function Participant({
   id,
   self,
-  producers = [],
   consumers = [],
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -22,23 +21,17 @@ export default function Participant({
 
     const stream = new MediaStream();
 
-    producers.forEach((producer) => {
-      if (producer.track) {
-        stream.addTrack(producer.track);
-      }
-    });
-
     consumers.forEach((consumer) => {
-      if (consumer.track) {
+      if (consumer?.track) {
         stream.addTrack(consumer.track);
       }
     });
 
     videoRef.current.srcObject = stream;
-  }, []);
+  }, [consumers]);
 
   return (
-    <div className="w-full h-full bg-gray-100 relative overflow-hidden">
+    <div className="w-full h  -full bg-gray-100 relative overflow-hidden">
       <video
         autoPlay
         playsInline

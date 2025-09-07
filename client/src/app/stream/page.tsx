@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { useParticipantStore } from "../stores/participant";
 import Participants from "../components/Participants";
 import {
@@ -13,6 +13,7 @@ export default function Stream() {
   const addProducer = useParticipantStore((state) => state.addProducer);
   const { sendTransport, isReady } = use(MediaSoupContext);
   const setLocalStream = useParticipantStore((state) => state.setLocalStream);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   function toggleMic() {
     setIsMicOn(!isMicOn);
@@ -39,10 +40,14 @@ export default function Stream() {
 
     const audioTrack = stream.getAudioTracks()[0];
     const videoTrack = stream.getVideoTracks()[0];
+
     const audioProducer = await sendTransport?.produce({
       track: audioTrack,
     });
     const videoProducer = await sendTransport?.produce({ track: videoTrack });
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+    }
 
     addProducer(audioProducer);
     addProducer(videoProducer);
@@ -54,7 +59,6 @@ export default function Stream() {
       <div className="flex items-center justify-between p-2 border-b border-gray-200">
         <h1 className="text-lg font-medium text-black">Meeting</h1>
       </div>
-
       <Participants />
 
       <div className="p-3 border-t border-gray-200">

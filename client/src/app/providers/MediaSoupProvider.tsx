@@ -84,6 +84,7 @@ export default function MediaSoupProvider({
             console.error("Producer transport creation failed:", res.error);
             return;
           }
+
           const producerTransport = device.createSendTransport(res.transport);
           setSendTransport(producerTransport);
 
@@ -171,13 +172,16 @@ export default function MediaSoupProvider({
           socket.on(
             "newConsumer",
             async ({ participantId, id, producerId, kind, rtpParameters }) => {
+
               const consumer = await consumerTransport.consume({
                 id,
                 producerId,
                 kind,
                 rtpParameters,
               });
+
               addParticipant(participantId, consumer);
+
             }
           );
         }

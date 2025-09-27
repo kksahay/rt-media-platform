@@ -68,9 +68,9 @@ export class Participant {
     consumerParticipant:
       | Socket
       | RemoteSocket<
-          DecorateAcknowledgementsWithMultipleResponses<DefaultEventsMap>,
-          any
-        >,
+        DecorateAcknowledgementsWithMultipleResponses<DefaultEventsMap>,
+        any
+      >,
     producer: Producer
   ) {
     const router = this.router;
@@ -148,8 +148,10 @@ export class Participant {
             if (consumerResult) {
               this.socket.emit("newConsumer", {
                 participantId: participant.id,
+                id: consumerResult.id,
                 producerId: producer.id,
-                ...consumerResult,
+                kind: consumerResult.kind,
+                rtpParameters: consumerResult.rtpParameters,
               });
             }
           }
@@ -167,6 +169,7 @@ export class Participant {
             producing,
             consuming,
           });
+
           callback({ success: true, transport });
         } catch (err) {
           callback({ success: false, error: (err as Error).message });
@@ -178,12 +181,15 @@ export class Participant {
       "connectWebRtcTransport",
       async ({ transportId, dtlsParameters }, callback) => {
         const transport = this.#webRtcTransports.get(transportId);
+
         if (!transport) {
           return callback({
             success: false,
             error: `transport ${transportId} not found`,
           });
         }
+
+
         try {
           await transport.connect({ dtlsParameters });
           callback({ success: true });
@@ -211,13 +217,16 @@ export class Participant {
           const otherParticipants = this.participants.filter(
             (p) => p.id !== this.socket.id
           );
+
           for (const other of otherParticipants) {
             const consumerResult = await this.#createConsumer(other, producer);
             if (consumerResult) {
               this.socket.to(other.id).emit("newConsumer", {
                 participantId: this.socket.id,
+                id: consumerResult.id,
                 producerId: producer.id,
-                ...consumerResult,
+                kind: consumerResult.kind,
+                rtpParameters: consumerResult.rtpParameters,
               });
             }
           }

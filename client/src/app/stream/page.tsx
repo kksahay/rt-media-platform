@@ -1,12 +1,10 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
-import SocketProvider from "../providers/SocketProvider";
+import { SocketContext } from "../providers/SocketProvider";
 import { useParticipantStore } from "../stores/participant";
 import Participants from "../components/Participants";
-import MediaSoupProvider, {
-  MediaSoupContext,
-} from "../providers/MediaSoupProvider";
+import { MediaSoupContext } from "../providers/MediaSoupProvider";
 
 export default function Stream() {
   const [isVideoOn, setIsVideoOn] = useState(true);
@@ -39,11 +37,13 @@ export default function Stream() {
     });
 
     const audioTrack = stream.getAudioTracks()[0];
-    // const videoTrack = stream.getVideoTracks()[0].clone();
+    // const videoTrack = stream.getVideoTracks()[0];
+
     const audioProducer = await sendTransport?.produce({
       track: audioTrack,
     });
-    //const videoProducer = await sendTransport.current?.produce({ track: videoTrack });
+    // const videoProducer = await sendTransport?.produce({ track: videoTrack });
+
     addProducer(audioProducer);
     // addProducer(videoProducer);
     setLocalStream(stream);
@@ -54,7 +54,6 @@ export default function Stream() {
       <div className="flex items-center justify-between p-2 border-b border-gray-200">
         <h1 className="text-lg font-medium text-black">Meeting</h1>
       </div>
-
       <Participants />
 
       <div className="p-3 border-t border-gray-200">

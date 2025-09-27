@@ -12,9 +12,7 @@ import {
   Worker,
   Router,
   AppData,
-  WebRtcServer,
-  Transport,
-  Producer,
+  WebRtcServer, Producer
 } from "mediasoup/types";
 import { createWorker } from "mediasoup";
 import {
